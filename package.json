@@ -1,0 +1,21 @@
+{
+  "type": "module",
+  "name": "twin-http-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "client.js",
+  "scripts": {
+    "deps": "npm ci",
+    "test": "mocha --recursive --timeout 600000",
+    "test-only": "mocha --timeout 600000",
+    "test-ci": "mocha --forbid-only --recursive --timeout 600000"
+},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.5.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.2.0"
+  }
+}
