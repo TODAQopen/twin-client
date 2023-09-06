@@ -1,5 +1,5 @@
-class TwinError extends Error {};
-class TwinAuthError extends TwinError {};
-class TwinMicropayError extends TwinError {};
-class TwinMicropayAmountMismatchError extends TwinMicropayError {};
-class TwinMicropayTokenMismatchError extends TwinMicropayError {};
+export class TwinError extends Error {};
+export class TwinAuthError extends TwinError {};
+export class TwinMicropayError extends TwinError {};
+export class TwinMicropayAmountMismatchError extends TwinMicropayError {};
+export class TwinMicropayTokenMismatchError extends TwinMicropayError {};
