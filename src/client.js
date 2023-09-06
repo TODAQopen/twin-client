@@ -1,4 +1,5 @@
 import axios from "axios"
+import * as err from "./error.js"
 
 class TwinClient {
     constructor({ url, apiKey }) {
