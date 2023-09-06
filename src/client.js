@@ -15,7 +15,7 @@ class TwinClient {
 
         this.clientConfig = {
             baseURL: this.twinUrl,
-            headers,
+            headers: this.headers,
             params: apiKey ? { apiKey: this.apiKey } : {},
             validateStatus: () => true // do not validate
         };
@@ -28,16 +28,18 @@ class TwinClient {
         return res.data;
     }
 
-    async micropay(url, tokenTypeHash, amount) {
+    async micropay(url, tokenTypeHash, amount, { method="GET", data }={}) {
         let destTwinClient = new TwinClient({ url });
         let destInfo = await destTwinClient.info(); 
         let {address: destinationAddress} = destInfo
-        let destinationUrl = encodeURI(`${url}/paywall`);
-        let res = await this.httpClient({
+        let destinationUrl = encodeURIComponent(`${url}/paywall`);
+        
+        let res = await this.httpClient.request({
             method,
-            url: `/pay/${destinationAddress}/${tokenTypeHash}/${amount}/${destinationUrl}`
+            url: `/pay/${destinationAddress}/${tokenTypeHash}/${amount}/${destinationUrl}`,
+            ... data ? { data } : {}
         });
-
+        
         return res.data;
     }
 
