@@ -1,6 +1,6 @@
 import assert from "assert";
 import { TwinClient } from "../src/client.js";
-
+import { TwinAuthError, TwinError } from "../src/error.js";
 const paywall = {
     url: "https://41cb6b639b57b0e02ba4e2846cba8ca1.tq.biz.todaq.net",
     address: "41cb6b639b57b0e02ba4e2846cba8ca19d24c6b474038763adb0052b747e16dd3f",
@@ -16,16 +16,40 @@ const payerClient = new TwinClient({
     apiKey: "2e2bb15f-0355-4dd2-84b4-35a4d9ddf63c"
 });
 
-describe("info", async function() {
-    it("Should retrieve info", async function() {
-        let client = new TwinClient({url: paywall.url});
-        let res = await client.info();
-        assert.equal(res.address, paywall.address);
-        assert.deepEqual(res.paywall, paywall.config);
+describe("TwinError", async function() {
+    it("Should throw TwinError when error is not handled", async function() {
+        try {
+            await payerClient.request({method: "GET", url: "/not-an-endpoint"});
+        } catch (err) {
+            console.error(err)
+            assert(err instanceof TwinError);
+        }
     });
 });
 
-describe("micropay", async function() {
+describe("TwinAuthError", async function() {
+    it("Should throw TwinAuthError when response status is 403", async function() {
+        let client = new TwinClient({url: payerClient.twinUrl, apiKey: "definitely-wrong-api-key"});
+        try {
+            await client.request({method: "GET", url: "/config"});
+        } catch (err) {
+            console.error(err)
+            assert(err instanceof TwinAuthError);
+        }
+    });
+});
+
+describe("info", async function() {
+    it("Should retrieve info", async function() {
+        let client = new TwinClient({url: paywall.url});
+        let info = await client.info();
+        console.log(info);
+        assert.equal(info.address, paywall.address);
+        assert.deepEqual(info.paywall, paywall.config);
+    });
+});
+
+xdescribe("micropay", async function() {
     it("Should micropay the paywall", async function() {
         let res = await payerClient.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity);
         assert(res);

@@ -1,4 +1,14 @@
-export class TwinError extends Error {};
+export class TwinError extends Error {
+    constructor(arg1, arg2) {
+        if (!arg2) {
+            super("TwinError");
+            this.data = arg1;
+        } else {
+            super(arg1);
+            this.data = arg2;
+        }
+    }
+};
 export class TwinAuthError extends TwinError {};
 export class TwinMicropayError extends TwinError {};
 export class TwinMicropayAmountMismatchError extends TwinMicropayError {};
