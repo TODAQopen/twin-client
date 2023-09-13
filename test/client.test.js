@@ -25,7 +25,7 @@ const payerClient = new TwinClient({
 describe("TwinError", async function() {
     it("Should throw TwinError when error is not handled", async function() {
         try {
-            await payerClient.request({method: "GET", url: "/not-an-endpoint"}); // the twin will respond with 404
+            await payerClient.httpClient.request({method: "GET", url: "/not-an-endpoint"}); // the twin will respond with 404
         } catch (err) {
             console.error(err)
             assert(err instanceof TwinError);
@@ -35,9 +35,9 @@ describe("TwinError", async function() {
 
 describe("TwinAuthError", async function() {
     it("Should throw TwinAuthError when response status is 403", async function() {
-        let client = new TwinClient({url: payerClient.twinUrl, apiKey: "definitely-wrong-api-key"});
+        let client = new TwinClient({url: payerClient.httpClient.url, apiKey: "definitely-wrong-api-key"});
         try {
-            await client.request({method: "GET", url: "/config"});
+            await client.httpClient.request({method: "GET", url: "/config"});
         } catch (err) {
             console.error(err)
             assert(err instanceof TwinAuthError);
@@ -62,6 +62,7 @@ describe("micropay", async function() {
             await payerClient.micropay(paywall.url, paywall.config.targetPayType, wrongAmount)
             assert.fail("Should throw TwinMicropayAmountMismatchError");
         } catch (err) {
+            console.error(err);
             assert(err instanceof TwinMicropayAmountMismatchError);
         }
     });
@@ -70,6 +71,7 @@ describe("micropay", async function() {
         try {
             await payerClient.micropay(paywall.url, wrongTokenHash, paywall.config.targetPayQuantity);
         } catch (err) {
+            console.error(err);
             assert(err instanceof TwinMicropayTokenMismatchError);
         }
     });

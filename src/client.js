@@ -1,56 +1,13 @@
-import axios from "axios"
 import * as err from "./error.js"
+import { TwinHttpClient } from "./http.js";
 
-
-class TwinHttpClient {
+class TwinClient {
     constructor({ url, apiKey }) {
-        this.twinUrl = url;
-        this.apiKey = apiKey;
-
-        this.defaultHeaders = {
-            "Content-Type": "application/json"
-        };
-
-        this.headers = {
-            ...this.defaultHeaders,
-        };
-
-        this.clientConfig = {
-            baseURL: this.twinUrl,
-            headers: this.headers,
-            params: apiKey ? { apiKey: this.apiKey } : {},
-        };
-
-        this.httpClient = axios.create(this.clientConfig);
-    }
-
-    async request(...args) {
-        try {
-            let res = await this.httpClient.request(...args);
-            return res.data;
-        } catch (e) {
-            if (e.response) {
-                let { status, data } = e.response;
-                if (status == 400) {
-                    throw new err.TwinError("Bad Request", data)
-                }
-                if (status == 403) {
-                    throw new err.TwinAuthError("Forbidden", data);
-                }
-                throw new err.TwinError("Unhandled", data)
-            }
-            throw e;
-        }
-    }
-}
-
-class TwinClient extends TwinHttpClient {
-    constructor({ url, apiKey }) {
-        super({ url, apiKey });
+        this.httpClient = new TwinHttpClient({ url, apiKey});
     }
 
     info() {
-        return this.request({
+        return this.httpClient.request({
             method: "GET",
             url: "/info"
         });
@@ -62,7 +19,7 @@ class TwinClient extends TwinHttpClient {
 
         let paywallConfig = paywallInfo.paywall;
         if (tokenTypeHash != paywallConfig.targetPayType) {
-            throw new err.TwinMicropayTokenMismatchError();
+            throw new err.TwinMicropayTokenMismatchError("");
         }
 
         if (amount != paywallConfig.targetPayQuantity) {
@@ -72,7 +29,7 @@ class TwinClient extends TwinHttpClient {
         let { address: destinationAddress } = paywallInfo;
         let destinationUrl = encodeURIComponent(`${url}/paywall`);
 
-        return await this.request({
+        return await this.httpClient.request({
             method,
             url: `/pay/${destinationAddress}/${tokenTypeHash}/${amount}/${destinationUrl}`,
             ...data ? { data } : {}
