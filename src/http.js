@@ -1,5 +1,5 @@
 import axios from "axios"
-import { TwinError, TwinAuthError } from "./error.js"
+import { HttpError } from "./error.js"
 
 class TwinHttpClient {
     constructor({ url, apiKey }) {
@@ -27,18 +27,11 @@ class TwinHttpClient {
         try {
             let res = await this.httpClient.request(...args);
             return res.data;
-        } catch (e) {
-            if (e.response) {
-                let { status, data } = e.response;
-                if (status == 400) {
-                    throw new TwinError("Bad Request", data)
-                }
-                if (status == 403) {
-                    throw new TwinAuthError("Forbidden", data);
-                }
-                throw new TwinError("Unhandled", data)
+        } catch (err) {
+            if (err.response) {
+                throw new HttpError(err.response.status, err.response.data);
             }
-            throw e;
+            throw err;
         }
     }
 }

@@ -1,3 +1,11 @@
+export class HttpError extends Error {
+    constructor(status, data) {
+        super("HttpError");
+        this.status = status;
+        this.data = data;
+    }
+}
+
 export class TwinError extends Error {
     constructor(arg1, arg2) {
         if (!arg2) {

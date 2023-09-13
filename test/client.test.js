@@ -25,7 +25,7 @@ const payerClient = new TwinClient({
 describe("TwinError", async function() {
     it("Should throw TwinError when error is not handled", async function() {
         try {
-            await payerClient.httpClient.request({method: "GET", url: "/not-an-endpoint"}); // the twin will respond with 404
+            await payerClient.request({method: "GET", url: "/not-an-endpoint"}); // the twin will respond with 404
         } catch (err) {
             console.error(err)
             assert(err instanceof TwinError);
@@ -37,7 +37,7 @@ describe("TwinAuthError", async function() {
     it("Should throw TwinAuthError when response status is 403", async function() {
         let client = new TwinClient({url: payerClient.httpClient.url, apiKey: "definitely-wrong-api-key"});
         try {
-            await client.httpClient.request({method: "GET", url: "/config"});
+            await client.request({ method: "GET", url: "/config" });
         } catch (err) {
             console.error(err)
             assert(err instanceof TwinAuthError);
