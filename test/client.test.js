@@ -70,6 +70,7 @@ describe("micropay", async function() {
         let wrongTokenHash = paywall.address; // toda hash but not a token
         try {
             await payerClient.micropay(paywall.url, wrongTokenHash, paywall.config.targetPayQuantity);
+            assert.fail("Should throw TwinMicropayTokenMismatchError");
         } catch (err) {
             console.error(err);
             assert(err instanceof TwinMicropayTokenMismatchError);
