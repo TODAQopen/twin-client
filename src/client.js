@@ -66,11 +66,11 @@ class TwinClient {
 
         let paywallConfig = paywallInfo.paywall;
         if (tokenTypeHash != paywallConfig.targetPayType) {
-            throw new TwinMicropayTokenMismatchError("");
+            throw new TwinMicropayTokenMismatchError(`paywall requires payment of token ${paywallConfig.targetPayType}; attempted to send ${tokenTypeHash}`);
         }
 
         if (amount != paywallConfig.targetPayQuantity) {
-            throw new TwinMicropayAmountMismatchError();
+            throw new TwinMicropayAmountMismatchError(`paywall requires payment of ${paywallConfig.targetPayQuantity}; attempted to send ${amount}`);
         }
 
         let { address: destinationAddress } = paywallInfo;
