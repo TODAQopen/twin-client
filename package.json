@@ -11,7 +11,6 @@
     "test-ci": "mocha --forbid-only --recursive --timeout 600000"
   },
   "author": "",
-  "license": "ISC",
   "dependencies": {
     "axios": "^1.5.0"
   },
