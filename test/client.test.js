@@ -8,18 +8,18 @@ import {
     TwinMicropayTokenMismatchError } from "../src/error.js";
 
 const paywall = {
-    url: "https://41cb6b639b57b0e02ba4e2846cba8ca1.tq.biz.todaq.net",
-    address: "41cb6b639b57b0e02ba4e2846cba8ca19d24c6b474038763adb0052b747e16dd3f",
+    url: "https://41d83ecbac7b2a50e451ee2a453fb8f4.tq.biz.todaq.net",
+    address: "41d83ecbac7b2a50e451ee2a453fb8f46a32fa071c9fab08f0d597eed3d0e74a0e",
     config: {
         targetUrl: "https://example.com",
-        targetPayType: "416c211b974961041c0df25e477a8c9feeac479444da73fca08eda652b042c69c9",
+        targetPayType: "41f88b1490292e22ac37a5da7d9cdb88cffda408ae12a188243ad209e6f9fa5ef9",
         targetPayQuantity: 1
     }
 };
 
 const payerClient = new TwinClient({
-    url: "https://41692d1e30fe869cf0c8f07838655635.tq.biz.todaq.net",
-    apiKey: "2e2bb15f-0355-4dd2-84b4-35a4d9ddf63c"
+    url: "https://4112873c42e819316dcfafdddb95a5cf.tq.biz.todaq.net",
+    apiKey: "41b95538-b2a5-4aea-9121-a7d4e8558a63"
 });
 
 describe("TwinError", async function() {
@@ -78,7 +78,7 @@ describe("micropay", async function() {
     xit("Should throw TwinMicropayError otherwise" , async function() {
 
     });
-    it("Should micropay the paywall", async function() {
+    it.only("Should micropay the paywall", async function() {
         let res = await payerClient.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity);
         assert(res);
     });
