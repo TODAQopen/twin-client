@@ -1,4 +1,4 @@
-import { TwinHttpClient } from "./http.js";
+import { HttpClient } from "./http.js";
 import {
     HttpError,
     TwinError,
@@ -8,12 +8,35 @@ import {
 
 class TwinClient {
     constructor({ url, apiKey }) {
-        this.httpClient = new TwinHttpClient({ url, apiKey});
+        this.url = url;
+        this.apiKey = apiKey;
+        this.httpClient = new HttpClient(url);
     }
 
-    async request(...args) {
+    async request(config) {
         try {
-            return await this.httpClient.request(...args);
+            let reqConfig = config;
+
+            if (!reqConfig.headers) {
+                reqConfig.headers = {};
+            }
+
+            if (!reqConfig.headers["content-type"]) {
+                reqConfig.headers["content-type"] = "application/json";
+            }
+
+            if (!reqConfig.params) {
+                reqConfig.params = {};
+            }
+
+            if (!reqConfig.params.apiKey) {
+                if (this.apiKey) {
+                    reqConfig.params.apiKey = this.apiKey;
+                }
+            }
+
+            return await this.httpClient.request(reqConfig);
+            // add apiKey here
         } catch (err) {
             if (err instanceof HttpError) {
                 // handle it here by making more specific errors

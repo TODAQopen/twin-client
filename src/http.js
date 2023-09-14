@@ -1,31 +1,18 @@
 import axios from "axios"
 import { HttpError } from "./error.js"
 
-class TwinHttpClient {
-    constructor({ url, apiKey }) {
+class HttpClient {
+    constructor(url) {
         this.url = url;
-        this.apiKey = apiKey;
 
-        this.defaultHeaders = {
-            "Content-Type": "application/json"
-        };
-
-        this.headers = {
-            ...this.defaultHeaders,
-        };
-
-        this.clientConfig = {
-            baseURL: this.url,
-            headers: this.headers,
-            params: apiKey ? { apiKey: this.apiKey } : {},
-        };
-
-        this.httpClient = axios.create(this.clientConfig);
+        this.httpClient = axios.create({
+            baseURL: this.url
+        });
     }
 
-    async request(...args) {
+    async request(config) {
         try {
-            let res = await this.httpClient.request(...args);
+            let res = await this.httpClient.request(config);
             return res.data;
         } catch (err) {
             if (err.response) {
@@ -36,4 +23,4 @@ class TwinHttpClient {
     }
 }
 
-export { TwinHttpClient };
+export { HttpClient };
