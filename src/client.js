@@ -4,7 +4,8 @@ import {
     TwinError,
     TwinAuthError,
     TwinMicropayAmountMismatchError,
-    TwinMicropayTokenMismatchError } from "./error.js"
+    TwinMicropayTokenMismatchError,
+    TwinMicropayError} from "./error.js"
 
 class TwinClient {
     constructor({ url, apiKey }) {
@@ -76,11 +77,18 @@ class TwinClient {
         let { address: destinationAddress } = paywallInfo;
         let destinationUrl = encodeURIComponent(`${url}/paywall`);
 
-        return await this.request({
-            method,
-            url: `/pay/${destinationAddress}/${tokenTypeHash}/${amount}/${destinationUrl}`,
-            ...data ? { data } : {}
-        });
+        try {
+            return await this.request({
+                method,
+                url: `/pay/${destinationAddress}/${tokenTypeHash}/${amount}/${destinationUrl}`,
+                ...data ? { data } : {}
+            });
+        } catch (err) {
+            if (err instanceof TwinError && err.message == "Bad Request") {
+                throw TwinMicropayError.fromTwinError(err);
+            }
+            throw err;
+        }
     }
 }
 

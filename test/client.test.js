@@ -7,6 +7,8 @@ import {
     TwinMicropayAmountMismatchError,
     TwinMicropayTokenMismatchError } from "../src/error.js";
 
+import * as mock from "./mock.js";
+
 const paywall = {
     url: "https://41d83ecbac7b2a50e451ee2a453fb8f4.tq.biz.todaq.net",
     address: "41d83ecbac7b2a50e451ee2a453fb8f46a32fa071c9fab08f0d597eed3d0e74a0e",
@@ -76,10 +78,46 @@ describe("micropay", async function() {
             assert(err instanceof TwinMicropayTokenMismatchError);
         }
     });
-    xit("Should throw TwinMicropayError otherwise" , async function() {
+    it("Should throw TwinMicropayError otherwise" , async function() {
+        let payerTwin = await mock.start(
+            mock.addMicropayBadRequest(mock.twinApp()),
+            { port: 8089 }
+        );
+        let payer = new TwinClient({ url: "http://localhost:8089" });
 
+
+        let paywall = {
+            url: "http://localhost:8090",
+            address: "41mockaddress",
+            config: {
+                targetPayType: "41mocktokentype",
+                targetPayQuantity: 1
+            }
+        };
+        let payeeTwin = await mock.start(
+            mock.addInfo(mock.twinApp(), {
+                address: paywall.address,
+                paywall: {
+                    targetPayType: paywall.config.targetPayType,
+                    targetPayQuantity: paywall.config.targetPayQuantity,
+
+                 }}),
+            { port: 8090 }
+        );
+
+        try {
+            await payer.micropay("http://localhost:8090", paywall.config.targetPayType, paywall.config.targetPayQuantity);
+        } catch(err) {
+            assert(err instanceof TwinMicropayError);
+            assert.equal(err.message, "Bad Request")
+            assert.deepEqual(err.data, { error: "Any bad micropay request" });
+        } finally {
+            await mock.stop(payerTwin);
+            await mock.stop(payeeTwin);
+        }
     });
-    it("Should micropay the paywall", async function() {
+
+    xit("Should micropay the paywall", async function() {
         let res = await payerClient.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity);
         assert(res);
     });

@@ -23,6 +23,9 @@ export class TwinMicropayError extends TwinError {
     constructor(message, data) {
         super(message || "TwinMicropayError", data);
     }
+    static fromTwinError({ message, data }) {
+        return new this(message, data);
+    }
 };
 
 export class TwinMicropayAmountMismatchError extends TwinMicropayError {
