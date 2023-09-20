@@ -117,7 +117,7 @@ describe("micropay", async function() {
         }
     });
 
-    xit("Should micropay the paywall", async function() {
+    it("Should micropay the paywall", async function() {
         let res = await payerClient.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity);
         assert(res);
     });
