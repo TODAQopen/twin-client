@@ -1,4 +1,5 @@
 import express from "express"
+import bodyParser from "body-parser";
 
 function twinApp() {
     return express()
@@ -39,10 +40,24 @@ function addMicropayBadRequest(app) {
     return app;
 }
 
+function addImportFileSuccess(app) {
+    return app.post("/toda", bodyParser.raw(), async function(_, res) {
+        res.status(201).json({});
+    });
+}
+
+function addImportFileError(app) {
+    return app.post("/toda", bodyParser.raw(), async function (_, res) {
+        res.status(400).json({ error: "Import error string" });
+    });
+}
+
 export {
     twinApp,
     start,
     stop,
     addInfo,
-    addMicropayBadRequest
+    addMicropayBadRequest,
+    addImportFileSuccess,
+    addImportFileError
 };

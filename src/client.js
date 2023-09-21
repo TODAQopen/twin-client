@@ -61,6 +61,35 @@ class TwinClient {
         });
     }
 
+    async pay(url, tokenTypeHash, amount) {
+        return this.request({
+            method: "POST",
+            url: `/dq/${tokenTypeHash}/transfer`,
+            data: {
+                destination: url,
+                amount
+            }
+        });
+    }
+
+    async fetch(hash) {
+        return this.request({
+            method: "GET",
+            url: `/toda/${hash}`,
+            headers: { "content-type": "application/octet-stream" }
+        });
+    }
+
+    async import(file) {
+        // assume file is already ByteArray
+        return this.request({
+            method: "POST",
+            url: "/toda",
+            data: file,
+            headers: { "content-type": "application/octet-stream" }
+        });
+    }
+
     async micropay(url, tokenTypeHash, amount, { method = "GET", data } = {}) {
         let paywallClient = new TwinClient({ url });
         let paywallInfo = await paywallClient.info();
