@@ -31,8 +31,8 @@ describe("TwinError", async function() {
         let url = "https://im-a-teapot.com";
         let mock = nock(url).get("/info").reply(418, { error: "Teapot" });
         try {
-            let client = new TwinClient({url});
-            await client.info();
+            await (new TwinClient({url})).info();
+            assert.fail("Should throw TwinError");
         } catch (err) {
             console.error(err)
             assert(err instanceof TwinError);
