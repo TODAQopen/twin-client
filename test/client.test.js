@@ -8,6 +8,7 @@ import {
     TwinMicropayTokenMismatchError } from "../src/error.js";
 
 import * as mock from "./mock.js";
+import nock from "nock"
 
 const paywall = {
     url: "https://41d83ecbac7b2a50e451ee2a453fb8f4.tq.biz.todaq.net",
@@ -27,12 +28,17 @@ const payer = {
 
 describe("TwinError", async function() {
     it("Should throw TwinError when error is not handled", async function() {
+        let url = "https://im-a-teapot.com";
+        let mock = nock(url).get("/info").reply(418, { error: "Teapot" });
         try {
-            let client = new TwinClient(payer);
-            await client.request({method: "GET", url: "/not-an-endpoint"}); // the twin will respond with 404
+            let client = new TwinClient({url});
+            await client.info();
         } catch (err) {
             console.error(err)
             assert(err instanceof TwinError);
+            assert.deepEqual(err.data, { error: "Teapot" });
+        } finally {
+            mock.done();
         }
     });
 });
