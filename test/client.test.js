@@ -7,7 +7,6 @@ import {
     TwinMicropayAmountMismatchError,
     TwinMicropayTokenMismatchError } from "../src/error.js";
 
-import * as mock from "./mock.js";
 import nock from "nock"
 
 const paywall = {
@@ -28,17 +27,15 @@ const payer = {
 
 describe("TwinError", async function() {
     it("Should throw TwinError when error is not handled", async function() {
-        let url = "https://im-a-teapot.com";
-        let mock = nock(url).get("/info").reply(418, { error: "Teapot" });
         try {
+            let url = "https://im-a-teapot";
+            nock(url).get("/info").reply(418, { error: "Teapot" });
             await (new TwinClient({url})).info();
             assert.fail("Should throw TwinError");
         } catch (err) {
-            console.error(err)
+            console.error(err);
             assert(err instanceof TwinError);
             assert.deepEqual(err.data, { error: "Teapot" });
-        } finally {
-            mock.done();
         }
     });
 });
@@ -77,41 +74,47 @@ describe("TwinClient.fetch", async function() {
 
 describe("TwinClient.import", async function() {
     it("Should handle import file failure", async function() {
-        let twinApp = mock.twinApp();
-        twinApp = mock.addImportFileError(twinApp);
-        let twinApi = await mock.start(twinApp, { port: 8089 });
-        let client = new TwinClient({ url: "http://localhost:8089" });
         try {
-            await client.import('some-binary-file-content')
+            let url = "https://import-file-error";
+            let data = Buffer.from("some-binary-file-content");
+            nock(url).post("/toda", data).reply(400, { error: "Import error string" });
+            await (new TwinClient({url})).import(data);
+            assert.fail("Should throw TwinError: Bad Request");
         } catch (err) {
+            console.error(err);
             assert(err instanceof TwinError);
             assert.equal(err.message, "Bad Request")
-            assert.deepEqual(err.data, {
-                error: "Import error string"
-            });
-        } finally {
-            await mock.stop(twinApi);
+            assert.deepEqual(err.data, { error: "Import error string" });
         }
     });
     it("Should handle import file success", async function() {
-        let twinApp = mock.twinApp();
-        twinApp = mock.addImportFileSuccess(twinApp);
-        let twinApi = await mock.start(twinApp, { port: 8089 });
-        let client = new TwinClient({ url: "http://localhost:8089" });
-        try {
-            let res = await client.import(Buffer.from('some-binary-file-content'));
-            assert(res)
-        } finally {
-            await mock.stop(twinApi);
-        }
+        let url = "https://import-file-succes";
+        let data = Buffer.from("some-binary-file-content");
+        nock(url).post("/toda", data).reply(201, {});
+        let res = await (new TwinClient({url})).import(data);
+        assert(res);
     });
 });
 
 describe("TwinClient.pay", async function() {
+    it("Should validate destination url before attempting transfer", async function() {
+        try {
+            let client = new TwinClient({url: paywall.url, apiKey: paywall.apiKey});
+            let url = "https://4123456.tq.biz.todaq.net";
+            let tokenTypeHash = paywall.config.targetPayType;
+            let amount = paywall.config.targetPayQuantity;
+            await client.pay(url, tokenTypeHash, amount);
+            assert.fail("Should throw TwinError");
+        } catch (err) {
+            console.error(err);
+            assert(err instanceof TwinError);
+            assert.equal(err.message, "Destination twin url not found");
+        }
+    });
     it("Should transfer payment to destination", async function() {
         // NOTE(sfertman): This test transfers from PAYWALL back to the PAYEE twin.
         let client = new TwinClient({url: paywall.url, apiKey: paywall.apiKey});
-        let url = payer.url;//.split("://")[1];
+        let url = payer.url;
         let tokenTypeHash = paywall.config.targetPayType;
         let amount = paywall.config.targetPayQuantity;
 
@@ -145,41 +148,36 @@ describe("TwinClient.micropay", async function() {
         }
     });
     it("Should throw TwinMicropayError otherwise" , async function() {
-        let payerTwin = await mock.start(
-            mock.addMicropayBadRequest(mock.twinApp()),
-            { port: 8089 }
-        );
-        let payer = new TwinClient({ url: "http://localhost:8089" });
+        let payerUrl = "https://payer-twin";
+        let payeeUrl = "https://payee-twin";
+        let payeeAddress = "mock-address";
+        let tokenType = "mock-token-type";
+        let quantity = 1;
+        let data = { mock: "data" };
 
+        nock(payerUrl)
+            .post(`/pay/${payeeAddress}/${tokenType}/${quantity}/https%3A%2F%2Fpayee-twin%2Fpaywall`, data)
+            .reply(400, { error: "Any bad micropay request" });
 
-        let paywall = {
-            url: "http://localhost:8090",
-            address: "41mockaddress",
-            config: {
-                targetPayType: "41mocktokentype",
-                targetPayQuantity: 1
-            }
-        };
-        let payeeTwin = await mock.start(
-            mock.addInfo(mock.twinApp(), {
-                address: paywall.address,
+        nock(payeeUrl)
+            .get("/info")
+            .reply(200, {
+                address: "mock-address",
                 paywall: {
-                    targetPayType: paywall.config.targetPayType,
-                    targetPayQuantity: paywall.config.targetPayQuantity,
-
-                 }}),
-            { port: 8090 }
-        );
+                    targetPayType: tokenType,
+                    targetPayQuantity: quantity }});
 
         try {
-            await payer.micropay("http://localhost:8090", paywall.config.targetPayType, paywall.config.targetPayQuantity);
-        } catch(err) {
+            await (new TwinClient({url: payerUrl})).micropay(payeeUrl, tokenType, quantity, {
+                method: "POST",
+                data
+            });
+            assert.fail("Should throw TwinMicropayError");
+        } catch (err) {
+            console.error(err);
             assert(err instanceof TwinMicropayError);
             assert.equal(err.message, "Bad Request")
             assert.deepEqual(err.data, { error: "Any bad micropay request" });
-        } finally {
-            await mock.stop(payerTwin);
-            await mock.stop(payeeTwin);
         }
     });
     it("Should micropay the paywall", async function() {
