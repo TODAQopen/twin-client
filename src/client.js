@@ -61,7 +61,7 @@ class TwinClient {
         });
     }
 
-    async pay(url, tokenTypeHash, amount) {
+    pay(url, tokenTypeHash, amount) {
         return this.request({
             method: "POST",
             url: `/dq/${tokenTypeHash}/transfer`,
@@ -72,7 +72,7 @@ class TwinClient {
         });
     }
 
-    async fetch(hash) {
+    fetch(hash) {
         return this.request({
             method: "GET",
             url: `/toda/${hash}`,
@@ -80,7 +80,7 @@ class TwinClient {
         });
     }
 
-    async import(file) {
+    import(file) {
         // assume file is already ByteArray
         return this.request({
             method: "POST",
