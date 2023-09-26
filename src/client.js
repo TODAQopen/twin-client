@@ -94,9 +94,9 @@ class TwinClient {
         });
     }
 
-    async download(hash, dir) {
+    async download(hash, dir = ".") {
         let bytes = await this.fetch(hash);
-        await fs.writeFile(path.join(dir || "", `${hash}.toda`), bytes);
+        await fs.writeFile(path.join(dir, `${hash}.toda`), bytes);
         return bytes;
     }
 
