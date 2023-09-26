@@ -50,9 +50,6 @@ class TwinClient {
                 if (status == 403) {
                     throw new TwinAuthError("Forbidden", data);
                 }
-                if (status == 404) {
-                    throw new TwinError("Not Found", data);
-                }
                 throw new TwinError("Unhandled", data)
             }
             throw err;
@@ -71,9 +68,7 @@ class TwinClient {
         try {
             await (new TwinClient({url})).info();
         } catch (err) {
-            if (err.message == "Not Found") {
-                throw new TwinError("Destination twin url not found");
-            }
+            throw new TwinError("Error connecting to destination twin", err.response || err);
         }
 
         return this.request({

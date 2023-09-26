@@ -143,7 +143,7 @@ describe("TwinClient.pay", async function() {
         } catch (err) {
             console.error(err);
             assert(err instanceof TwinError);
-            assert.equal(err.message, "Destination twin url not found");
+            assert.equal(err.message, "Error connecting to destination twin");
         }
     });
     it("Should transfer payment to destination", async function() {
