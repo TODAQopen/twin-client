@@ -64,10 +64,26 @@ describe("TwinClient.info", async function() {
 describe("TwinClient.fetch", async function() {
     it("Should fetch binary toda file from twin", async function() {
         let client = new TwinClient(payer);
-        let info = await client.info();
-        let { binderId } = info;
+        let { binderId } = await client.info();
         let binderBinary = await client.fetch(binderId);
         assert(binderBinary.length > 0);
+    });
+});
+
+describe("TwinClient.download", async () => {
+    it("Should fetch a binary toda file and save it", async()=> {
+        let storeDir = `./test/download`;
+        await fs.mkdir(storeDir, { recursive: true });
+        try {
+            let client = new TwinClient(payer);
+            let { binderId } = await client.info();
+            let bytes = await client.download(binderId, storeDir);
+            assert(bytes.length > 0);
+            let bytesOnDisk = await fs.readFile(`${storeDir}/${binderId}.toda`);
+            assert.equal(bytesOnDisk.toString(), bytes.toString(), "Bytes should be saved to disk");
+        } finally {
+            await fs.rm(storeDir, { recursive: true });
+        }
     });
 });
 

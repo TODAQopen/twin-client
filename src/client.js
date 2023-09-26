@@ -1,3 +1,5 @@
+import path from "path";
+import fs from "fs/promises";
 import { HttpClient } from "./http.js";
 import {
     HttpError,
@@ -90,6 +92,12 @@ class TwinClient {
             url: `/toda/${hash}`,
             headers: { "content-type": "application/octet-stream" }
         });
+    }
+
+    async download(hash, dir) {
+        let bytes = await this.fetch(hash);
+        await fs.writeFile(path.join(dir || "", `${hash}.toda`), bytes);
+        return bytes;
     }
 
     import(file) {
