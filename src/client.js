@@ -109,6 +109,11 @@ class TwinClient {
         });
     }
 
+    async upload(filePath) {
+        let bytes = await fs.readFile(filePath);
+        return this.import(bytes);
+    }
+
     async micropay(url, tokenTypeHash, amount, { method = "GET", data } = {}) {
         let paywallClient = new TwinClient({ url });
         let paywallInfo = await paywallClient.info();

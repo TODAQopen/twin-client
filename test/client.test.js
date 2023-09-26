@@ -1,3 +1,4 @@
+import fs from "fs/promises";
 import assert from "assert";
 import { TwinClient } from "../src/client.js";
 import {
@@ -70,9 +71,9 @@ describe("TwinClient.fetch", async function() {
     });
 });
 
-describe("TwinClient.download", async () => {
-    it("Should fetch a binary toda file and save it", async()=> {
-        let storeDir = `./test/download`;
+describe("TwinClient.download", async function () {
+    it("Should fetch a binary toda file and save it", async function() {
+        let storeDir = "./test/download";
         await fs.mkdir(storeDir, { recursive: true });
         try {
             let client = new TwinClient(payer);
@@ -109,6 +110,25 @@ describe("TwinClient.import", async function() {
         let res = await (new TwinClient({url})).import(data);
         assert(res);
     });
+});
+
+describe("TwinClient.upload", async function() {
+   it("Should read file from disk and upload to twin", async function() {
+        let storeDir = "./test/upload";
+        let fileName = "upload-test-file.toda";
+        let filePath = `${storeDir}/${fileName}`;
+        let data = Buffer.from("some-binary-file-content");
+        await fs.mkdir(storeDir, { recursive: true });
+        await fs.writeFile(filePath, data);
+        let url = "https://upload-file-success";
+        nock(url).post("/toda", data).reply(201, {});
+        try {
+            let res = await (new TwinClient({url})).upload(filePath)
+            assert(res);
+        } finally {
+            await fs.rm(storeDir, { recursive: true });
+        }
+   });
 });
 
 describe("TwinClient.pay", async function() {
