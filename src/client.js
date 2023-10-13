@@ -63,6 +63,13 @@ class TwinClient {
         });
     }
 
+    balance(typeHash) {
+        return this.request({
+            method: "GET",
+            url: `/dq/${typeHash}`
+        });
+    }
+
     async pay(url, tokenTypeHash, amount) {
 
         try {

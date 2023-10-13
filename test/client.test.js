@@ -62,6 +62,17 @@ describe("TwinClient.info", async function() {
     });
 });
 
+describe("TwinClient.balance", async function() {
+    it("Should get balance for dq type", async function() {
+        let client = new TwinClient(payer);
+        let typeHash = paywall.config.targetPayType;
+        let res = await client.balance(typeHash);
+        assert(res);
+        assert.equal(typeof res.balance, "number");
+        assert.equal(res.type, typeHash);
+    });
+});
+
 describe("TwinClient.fetch", async function() {
     it("Should fetch binary toda file from twin", async function() {
         let client = new TwinClient(payer);
