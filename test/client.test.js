@@ -228,8 +228,13 @@ describe("TwinClient.micropay", async function() {
     });
     it("Should micropay the paywall", async function() {
         let client = new TwinClient(payer);
-        let res = await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity);
-        assert(res);
-        await new Promise((res) => setTimeout(() => res(true), 5000));
+        try {
+            let res = await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity);
+            assert(res);
+            await new Promise((res) => setTimeout(() => res(true), 5000));
+        } catch (err) {
+            console.error(err);
+            assert.fail("should not throw")
+        }
     });
 });
