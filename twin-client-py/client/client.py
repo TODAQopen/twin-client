@@ -22,17 +22,15 @@ class TwinClient:
     if not 'apiKey' in req_config:
       if self.api_key:
         req_config['params']['apiKey'] = self.api_key
-    print(req_config)
     resp = requests.request(method, f'{self.url}{url}', **req_config)
-    print(resp.status_code, resp.content)
     if resp.status_code >= 200 and resp.status_code < 300:
       return resp
     elif resp.status_code == 400:
-      raise TwinError('Bad Request', resp.content)
+      raise TwinError('Bad Request', resp.json())
     elif resp.status_code == 403:
-      raise TwinAuthError('Forbidden', resp.content)
+      raise TwinAuthError('Forbidden', resp.json())
     else:
-      raise TwinError('Unhandled', resp.content)
+      raise TwinError('Unhandled', resp.json())
 
   def info(self):
     return self.request('get', '/info').json()
@@ -59,7 +57,7 @@ class TwinClient:
 
   def import_file(self, file):
     headers = {'content-type':'application/octet-stream'}
-    return self.request('post', '/toda', headers=headers, data=file)
+    return self.request('post', '/toda', headers=headers, data=file).json()
 
   def upload(self, file_path):
     with open(file_path, 'rb') as f:
