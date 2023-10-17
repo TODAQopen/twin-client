@@ -40,10 +40,8 @@ class TwinClient:
       TwinClient(url=url).info()
     except TwinError as err:
       raise TwinError('Error connecting to destination twin', err)
-    return self.request('post', f'/dq/{token_type_hash}/transfer', json={
-      'destination': url,
-      'amount': amount
-    }).json()
+    body = { 'destination': url, 'amount': amount }
+    return self.request('post', f'/dq/{token_type_hash}/transfer', json=body).json()
 
   def fetch(self, hash):
     headers = {'content-type':'application/octet-stream'}

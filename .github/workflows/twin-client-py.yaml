@@ -1,0 +1,33 @@
+name: twin-client-py
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - af-python
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 5
+
+    steps:
+
+      - name: Use python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        working-directory: twin-client-py
+        run: |
+          pip install -r requirements.txt \
+                      -r requirements.dev.txt
+
+      - name: Test
+        working-directory: twin-client-py
+        run: python -m unittest

@@ -125,12 +125,17 @@ class TestTwinClient(unittest.TestCase):
 
   def test_pay(self):
     # NOTE(sfertman): This test transfers from PAYWALL back to the PAYEE twin.
+    time.sleep(10)
     client = TwinClient(paywall['url'], paywall['api_key'])
     url = payer['url']
     token_type_hash = paywall['config']['targetPayType']
     amount = paywall['config']['targetPayQuantity']
-    res = client.pay(url, token_type_hash, amount)
-    assert res['result'] == 'Success'
+    try:
+      result = client.pay(url, token_type_hash, amount)
+    except Exception as err:
+      print(err.message, err.data)
+      raise err
+    assert result['result'] == 'Success'
 
   def test_micropay_amt_mismatch_error(self):
     pay_url = paywall['url']
@@ -157,7 +162,6 @@ class TestTwinClient(unittest.TestCase):
     except TwinMicropayTokenMismatchError as err:
       print(err.message, err.data)
       assert err.message == f'paywall requires payment of token {pay_type}; attempted to send {wrong_type}'
-      pass
 
   @requests_mock.Mocker(real_http=True)
   def test_micropay_error(self, mreq):
@@ -191,5 +195,9 @@ class TestTwinClient(unittest.TestCase):
     pay_url = paywall['url']
     pay_type = paywall['config']['targetPayType']
     pay_amt = paywall['config']['targetPayQuantity']
-    result = TwinClient(**payer).micropay(pay_url, pay_type, pay_amt)
+    try:
+      result = TwinClient(**payer).micropay(pay_url, pay_type, pay_amt)
+    except Exception as err:
+      print(err.message, err.data)
+      raise err
     assert result
