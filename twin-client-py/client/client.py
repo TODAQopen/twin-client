@@ -65,7 +65,7 @@ class TwinClient:
     return self.import_file(file_bytes)
 
   def micropay(self, url, token_type_hash, amount, method='get', data=None):
-    paywall_client = TwinClient(url=url)
+    paywall_client = TwinClient(url)
     try:
       paywall_info = paywall_client.info()
     except TwinError as err:
@@ -76,8 +76,8 @@ class TwinClient:
     if amount != paywall_config['targetPayQuantity']:
       raise TwinMicropayAmountMismatchError(f'paywall requires payment of {paywall_config["targetPayQuantity"]}; attempted to send {amount}')
 
-    destination_address = paywall_config['address']
-    destination_url = quote(f'{url}/paywall')
+    destination_address = paywall_info['address']
+    destination_url = quote(f'{url}/paywall', safe='')
     try:
       return self.request(method, f'/pay/{destination_address}/{token_type_hash}/{amount}/{destination_url}', json=data)
     except TwinError as err:
