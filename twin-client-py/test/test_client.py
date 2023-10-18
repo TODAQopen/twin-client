@@ -7,20 +7,18 @@ from client import TwinClient
 from client.error import *
 
 paywall = {
-  ## TODO(sfertman): need to make new account for the python client because tests will run at the same time and clobber each other
-  'url': 'https://41d83ecbac7b2a50e451ee2a453fb8f4.tq.biz.todaq.net',
-  'address': '41d83ecbac7b2a50e451ee2a453fb8f46a32fa071c9fab08f0d597eed3d0e74a0e',
-  'api_key': '8c0b7fb3-c832-4c54-9f8f-3a5e8eef4e52',
+  'url': "https://41678ba2d72dc94b1ba816b93bc98045.tq.biz.todaq.net",
+  'address': "41678ba2d72dc94b1ba816b93bc98045a2dee5af6982c75685e1f1b57c19dcac29",
+  'api_key': "f9ee1ee8-2966-4ed9-b3a7-3dc6dc9a7fc9",
   'config': {
-    'targetPayType': '41f88b1490292e22ac37a5da7d9cdb88cffda408ae12a188243ad209e6f9fa5ef9',
+    'targetPayType': "41796848130c3b7527d2bcf289ff3504ebc105f4976741c3b8af65f02db43a81ee",
     'targetPayQuantity': 1
   }
 }
 
 payer = {
-  ## TODO(sfertman): need to make new account for the python client because tests will run at the same time and clobber each other
-  'url': 'https://4112873c42e819316dcfafdddb95a5cf.tq.biz.todaq.net',
-  'api_key': '41b95538-b2a5-4aea-9121-a7d4e8558a63'
+  'url': "https://410ff3ca7c44caa0716cf831cda444e2.tq.biz.todaq.net",
+  'api_key': "fff53e8c-bb79-4662-a3c7-96ee294c13e6"
 }
 
 class TestTwinClient(unittest.TestCase):
