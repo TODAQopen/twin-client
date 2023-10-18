@@ -3,10 +3,6 @@ import requests
 from urllib.parse import quote
 from .error import *
 
-# __all___
-# python poetry for package management
-# make sure all 3.7+ python version work.
-
 class TwinClient:
   def __init__(self, url: str, api_key: str = None):
     self.url = url
