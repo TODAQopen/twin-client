@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - master
-      - af-python
 
 jobs:
   test:
