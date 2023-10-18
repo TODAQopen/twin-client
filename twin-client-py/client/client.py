@@ -31,6 +31,9 @@ class TwinClient:
   def info(self):
     return self.request('get', '/info').json()
 
+  def balance(self, type_hash):
+    return self.request('get', f'/dq/{type_hash}').json()
+
   def pay(self, url, token_type_hash, amount):
     try:
       TwinClient(url=url).info()

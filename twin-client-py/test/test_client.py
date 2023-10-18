@@ -1,3 +1,4 @@
+import numbers
 import os
 import shutil
 import time
@@ -48,6 +49,13 @@ class TestTwinClient(unittest.TestCase):
     info = TwinClient(paywall['url']).info()
     self.assertEqual(info['address'], paywall['address'])
     self.assertDictEqual(info['paywall'], paywall['config'])
+
+  def test_balance(self):
+    type_hash = paywall['config']['targetPayType']
+    result = TwinClient(**payer).balance(type_hash)
+    assert result
+    assert isinstance(result['balance'], numbers.Number)
+    assert result['type'] == type_hash
 
   def test_fetch(self):
     client = TwinClient(**payer)
