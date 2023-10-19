@@ -54,7 +54,7 @@ class TwinClient {
                 if (status == 423) {
                     throw new TwinBusyError(null, data);
                 }
-                throw new TwinError("Unhandled", err);
+                throw new TwinError(data?.error || "Unhandled", err);
             }
             throw err;
         }

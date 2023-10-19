@@ -36,7 +36,7 @@ describe("TwinError", async function() {
         } catch (err) {
             console.error(err);
             assert(err instanceof TwinError);
-            assert.deepEqual(err.data, { error: "Teapot" });
+            assert.equal(err.message, "Teapot");
         }
     });
 });
