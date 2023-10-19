@@ -4,6 +4,7 @@ import { TwinClient } from "../src/client.js";
 import {
     TwinError,
     TwinAuthError,
+    TwinBusyError,
     TwinMicropayError,
     TwinMicropayAmountMismatchError,
     TwinMicropayTokenMismatchError } from "../src/error.js";
@@ -166,6 +167,22 @@ describe("TwinClient.pay", async function() {
 
         let res = await client.pay(url, tokenTypeHash, amount);
         assert.equal(res.result, "Success");
+    });
+    it("Should handle 423 when attempting parallel payments", async function() {
+        try {
+            let client = new TwinClient({url: paywall.url, apiKey: paywall.apiKey});
+            let url = payer.url;
+            let tokenTypeHash = paywall.config.targetPayType;
+            let amount = paywall.config.targetPayQuantity;
+            await Promise.all([
+                client.pay(url, tokenTypeHash, amount),
+                client.pay(url, tokenTypeHash, amount)
+            ]);
+            assert.fail("Should throw TwinBusyError");
+        } catch (err) {
+            console.error(err);
+            assert(err instanceof TwinBusyError);
+        }
     });
 });
 
