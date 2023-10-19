@@ -166,7 +166,6 @@ describe("TwinClient.pay", async function() {
 
         let res = await client.pay(url, tokenTypeHash, amount);
         assert.equal(res.result, "Success");
-        await new Promise((res) => setTimeout(() => res(true), 5000));
     });
 });
 
@@ -231,7 +230,6 @@ describe("TwinClient.micropay", async function() {
         try {
             let res = await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity);
             assert(res);
-            await new Promise((res) => setTimeout(() => res(true), 5000));
         } catch (err) {
             console.error(err);
             assert.fail("should not throw")
