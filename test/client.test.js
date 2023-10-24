@@ -4,6 +4,7 @@ import { TwinClient } from "../src/client.js";
 import {
     TwinError,
     TwinAuthError,
+    TwinBusyError,
     TwinMicropayError,
     TwinMicropayAmountMismatchError,
     TwinMicropayTokenMismatchError } from "../src/error.js";
@@ -35,7 +36,7 @@ describe("TwinError", async function() {
         } catch (err) {
             console.error(err);
             assert(err instanceof TwinError);
-            assert.deepEqual(err.data, { error: "Teapot" });
+            assert.equal(err.message, "Teapot");
         }
     });
 });
@@ -166,7 +167,22 @@ describe("TwinClient.pay", async function() {
 
         let res = await client.pay(url, tokenTypeHash, amount);
         assert.equal(res.result, "Success");
-        await new Promise((res) => setTimeout(() => res(true), 5000));
+    });
+    it("Should handle 423 when attempting parallel payments", async function() {
+        try {
+            let client = new TwinClient({url: paywall.url, apiKey: paywall.apiKey});
+            let url = payer.url;
+            let tokenTypeHash = paywall.config.targetPayType;
+            let amount = paywall.config.targetPayQuantity;
+            await Promise.all([
+                client.pay(url, tokenTypeHash, amount),
+                client.pay(url, tokenTypeHash, amount)
+            ]);
+            assert.fail("Should throw TwinBusyError");
+        } catch (err) {
+            console.error(err);
+            assert(err instanceof TwinBusyError);
+        }
     });
 });
 
@@ -228,8 +244,12 @@ describe("TwinClient.micropay", async function() {
     });
     it("Should micropay the paywall", async function() {
         let client = new TwinClient(payer);
-        let res = await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity);
-        assert(res);
-        await new Promise((res) => setTimeout(() => res(true), 5000));
+        try {
+            let res = await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity);
+            assert(res);
+        } catch (err) {
+            console.error(err);
+            assert.fail("should not throw")
+        }
     });
 });

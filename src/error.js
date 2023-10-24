@@ -19,6 +19,12 @@ export class TwinAuthError extends TwinError {
     }
 };
 
+export class TwinBusyError extends TwinError {
+    constructor(message, data) {
+        super(message || "TwinBusyError", data);
+    }
+}
+
 export class TwinMicropayError extends TwinError {
     constructor(message, data) {
         super(message || "TwinMicropayError", data);
