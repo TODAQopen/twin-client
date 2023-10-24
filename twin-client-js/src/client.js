@@ -5,6 +5,7 @@ import {
     HttpError,
     TwinError,
     TwinAuthError,
+    TwinBusyError,
     TwinMicropayAmountMismatchError,
     TwinMicropayTokenMismatchError,
     TwinMicropayError} from "./error.js"
@@ -50,7 +51,10 @@ class TwinClient {
                 if (status == 403) {
                     throw new TwinAuthError("Forbidden", data);
                 }
-                throw new TwinError("Unhandled", data)
+                if (status == 423) {
+                    throw new TwinBusyError(null, data);
+                }
+                throw new TwinError(data?.error || "Unhandled", err);
             }
             throw err;
         }
