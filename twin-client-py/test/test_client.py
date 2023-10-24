@@ -127,7 +127,7 @@ class TestTwinClient(unittest.TestCase):
       print('Should trow TwinError')
       assert False
     except TwinError as err:
-      assert err.message == 'Error connecting to destination twin'
+      assert err.message == 'Error retrieving destination twin info'
 
   def test_pay(self):
     # NOTE(sfertman): This test transfers from PAYWALL back to the PAYEE twin.

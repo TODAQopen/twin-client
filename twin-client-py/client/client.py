@@ -36,9 +36,9 @@ class TwinClient:
 
   def pay(self, url, token_type_hash, amount):
     try:
-      TwinClient(url=url).info()
+      TwinClient(url).info()
     except TwinError as err:
-      raise TwinError('Error connecting to destination twin', err)
+      raise TwinError('Error retrieving destination twin info', err)
     body = { 'destination': url, 'amount': amount }
     return self.request('post', f'/dq/{token_type_hash}/transfer', json=body).json()
 
@@ -66,7 +66,7 @@ class TwinClient:
     try:
       paywall_info = paywall_client.info()
     except TwinError as err:
-      raise TwinError('Error connecting to destination twin', err)
+      raise TwinError('Error retrieving destination twin info', err)
     paywall_config = paywall_info['paywall']
     if token_type_hash != paywall_config['targetPayType']:
       raise TwinMicropayTokenMismatchError(f'paywall requires payment of token {paywall_config["targetPayType"]}; attempted to send {token_type_hash}')
