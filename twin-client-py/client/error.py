@@ -5,21 +5,18 @@ class TwinError(Exception):
     super().__init__(self.message)
 
 class TwinAuthError(TwinError):
-  def __init__(self, message=None, data=None):
-    super().__init__(message, data)
+  pass
+
+class TwinBusyError(TwinError):
+  pass
 
 class TwinMicropayError(TwinError):
-  def __init__(self, message=None, data=None):
-    super().__init__(message, data)
-
   @staticmethod
   def from_twin_error(err):
     return TwinMicropayError(err.message, err.data)
 
 class TwinMicropayAmountMismatchError(TwinMicropayError):
-  def __init__(self, message=None, data=None):
-    super().__init__(message, data)
+  pass
 
 class TwinMicropayTokenMismatchError(TwinMicropayError):
-  def __init__(self, message=None, data=None):
-    super().__init__(message, data)
+  pass
