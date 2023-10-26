@@ -4,6 +4,7 @@ import shutil
 import time
 import unittest
 import requests_mock
+import multiprocessing
 from client import TwinClient
 from client.error import *
 
@@ -128,6 +129,25 @@ class TestTwinClient(unittest.TestCase):
       assert False
     except TwinError as err:
       assert err.message == 'Error retrieving destination twin info'
+
+  def test_pay_busy_fail(self):
+    try:
+      client = TwinClient(url=paywall['url'], api_key=paywall['api_key'])
+      url = payer['url']
+      token_type_hash = paywall['config']['targetPayType']
+      amount = paywall['config']['targetPayQuantity']
+
+      inputs = [[url, token_type_hash, amount],
+                [url, token_type_hash, amount]]
+      with multiprocessing.Pool(processes=2) as pool:
+        for res in pool.starmap(client.pay, inputs):
+          print(res.status_code)
+
+      print('Should throw TwinBusyError')
+      assert False
+    except TwinBusyError as err:
+      print(err.message, err.data)
+      assert err.message == 'TwinBusyError'
 
   def test_pay(self):
     # NOTE(sfertman): This test transfers from PAYWALL back to the PAYEE twin.
