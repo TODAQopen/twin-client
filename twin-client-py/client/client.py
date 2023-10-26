@@ -25,8 +25,12 @@ class TwinClient:
       raise TwinError('Bad Request', resp.json())
     elif resp.status_code == 403:
       raise TwinAuthError('Forbidden', resp.json())
+    elif resp.status_code == 423:
+      raise TwinBusyError(None, resp.json())
     else:
-      raise TwinError('Unhandled', resp.json())
+      data = resp.json()
+      message = data['error'] if 'error' in data else 'Unhandled'
+      raise TwinError(message, data)
 
   def info(self):
     return self.request('get', '/info').json()
