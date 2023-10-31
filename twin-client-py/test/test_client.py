@@ -216,13 +216,27 @@ class TestTwinClient(unittest.TestCase):
       assert err.message == 'Bad Request'
       assert err.data == { 'error': "Any bad micropay request" }
 
+  def test_micropay_example_404(self):
+    time.sleep(10)
+    pay_url = paywall['url']
+    pay_type = paywall['config']['targetPayType']
+    pay_amt = paywall['config']['targetPayQuantity']
+    try:
+      TwinClient(**payer).micropay(pay_url, pay_type, pay_amt, paywall_tail='/hello?some-param=42&some-other-param=53')
+      # NOTE(sfertman): ^ /hello... returns 404 from example.com
+      assert False
+    except Exception as err:
+      print(err.message, err.data)
+      assert err.message == 'Unhandled'
+      assert err.data.status_code == 404
+
   def test_micropay(self):
     time.sleep(10)
     pay_url = paywall['url']
     pay_type = paywall['config']['targetPayType']
     pay_amt = paywall['config']['targetPayQuantity']
     try:
-      result = TwinClient(**payer).micropay(pay_url, pay_type, pay_amt)
+      result = TwinClient(**payer).micropay(pay_url, pay_type, pay_amt, paywall_tail='?some-param=42&some-other-param=53')
     except Exception as err:
       print(err.message, err.data)
       raise err

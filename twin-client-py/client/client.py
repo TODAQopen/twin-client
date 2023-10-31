@@ -28,9 +28,13 @@ class TwinClient:
     elif resp.status_code == 423:
       raise TwinBusyError(None, resp.json())
     else:
-      data = resp.json()
-      message = data['error'] if 'error' in data else 'Unhandled'
-      raise TwinError(message, data)
+      try:
+        data = resp.json()
+        message = data['error'] if 'error' in data else 'Unhandled'
+        err = TwinError(message, data)
+      except Exception:
+        err = TwinError('Unhandled', resp)
+      raise err
 
   def info(self):
     return self.request('get', '/info').json()
@@ -65,7 +69,7 @@ class TwinClient:
       file_bytes = f.read()
     return self.import_file(file_bytes)
 
-  def micropay(self, url, token_type_hash, amount, method='get', data=None):
+  def micropay(self, url, token_type_hash, amount, method='get', paywall_tail='', data=None):
     paywall_client = TwinClient(url)
     try:
       paywall_info = paywall_client.info()
@@ -78,7 +82,7 @@ class TwinClient:
       raise TwinMicropayAmountMismatchError(f'paywall requires payment of {paywall_config["targetPayQuantity"]}; attempted to send {amount}')
 
     destination_address = paywall_info['address']
-    destination_url = quote(f'{url}/paywall', safe='')
+    destination_url = quote(f'{url}/paywall{paywall_tail}', safe='')
     try:
       return self.request(method, f'/pay/{destination_address}/{token_type_hash}/{amount}/{destination_url}', json=data)
     except TwinError as err:
