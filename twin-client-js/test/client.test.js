@@ -209,7 +209,7 @@ describe("TwinClient.micropay", async function() {
             assert(err instanceof TwinMicropayTokenMismatchError);
         }
     });
-    it("Should throw TwinMicropayError otherwise" , async function() {
+    it.only("Should throw TwinMicropayError otherwise" , async function() {
         let payerUrl = "https://payer-twin";
         let payeeUrl = "https://payee-twin";
         let payeeAddress = "mock-address";
@@ -218,7 +218,7 @@ describe("TwinClient.micropay", async function() {
         let data = { mock: "data" };
 
         nock(payerUrl)
-            .post(`/pay/${payeeAddress}/${tokenType}/${quantity}/https%3A%2F%2Fpayee-twin%2Fpaywall`, data)
+            .post(`/pay/${payeeAddress}/${tokenType}/${quantity}/https%3A%2F%2Fpayee-twin%2Fpaywall%2F`, data)
             .reply(400, { error: "Any bad micropay request" });
 
         nock(payeeUrl)
