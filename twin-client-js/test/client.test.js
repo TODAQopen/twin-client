@@ -209,7 +209,7 @@ describe("TwinClient.micropay", async function() {
             assert(err instanceof TwinMicropayTokenMismatchError);
         }
     });
-    it.only("Should throw TwinMicropayError otherwise" , async function() {
+    it("Should throw TwinMicropayError otherwise" , async function() {
         let payerUrl = "https://payer-twin";
         let payeeUrl = "https://payee-twin";
         let payeeAddress = "mock-address";
