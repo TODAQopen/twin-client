@@ -202,7 +202,7 @@ class TestTwinClient(unittest.TestCase):
       'paywall': {
         'targetPayType': token_type,
         'targetPayQuantity': quantity }})
-    micropay_url = f'{payer_url}/pay/{payee_address}/{token_type}/{quantity}/https%3A%2F%2Fpayee-twin%2Fpaywall'
+    micropay_url = f'{payer_url}/pay/{payee_address}/{token_type}/{quantity}/https%3A%2F%2Fpayee-twin%2Fpaywall%2F'
     mreq.register_uri('post', micropay_url,
                       status_code=400,
                       json={ 'error': "Any bad micropay request" })
