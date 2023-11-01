@@ -131,6 +131,7 @@ class TestTwinClient(unittest.TestCase):
       assert err.message == 'Error retrieving destination twin info'
 
   def test_pay_busy_fail(self):
+    time.sleep(5)
     try:
       client = TwinClient(url=paywall['url'], api_key=paywall['api_key'])
       url = payer['url']
@@ -151,7 +152,7 @@ class TestTwinClient(unittest.TestCase):
 
   def test_pay(self):
     # NOTE(sfertman): This test transfers from PAYWALL back to the PAYEE twin.
-    time.sleep(10)
+    time.sleep(5)
     client = TwinClient(paywall['url'], paywall['api_key'])
     url = payer['url']
     token_type_hash = paywall['config']['targetPayType']
@@ -217,7 +218,7 @@ class TestTwinClient(unittest.TestCase):
       assert err.data == { 'error': "Any bad micropay request" }
 
   def test_micropay_example_404(self):
-    time.sleep(10)
+    time.sleep(5)
     pay_url = paywall['url']
     pay_type = paywall['config']['targetPayType']
     pay_amt = paywall['config']['targetPayQuantity']
@@ -231,7 +232,7 @@ class TestTwinClient(unittest.TestCase):
       assert err.data.status_code == 404
 
   def test_micropay(self):
-    time.sleep(10)
+    time.sleep(5)
     pay_url = paywall['url']
     pay_type = paywall['config']['targetPayType']
     pay_amt = paywall['config']['targetPayQuantity']

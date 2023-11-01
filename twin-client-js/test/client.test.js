@@ -145,6 +145,7 @@ describe("TwinClient.upload", async function() {
 
 describe("TwinClient.pay", async function() {
     it("Should validate destination url before attempting transfer", async function() {
+        await new Promise(resolve => setTimeout(resolve, 5000));
         try {
             let client = new TwinClient({url: paywall.url, apiKey: paywall.apiKey});
             let url = "https://4123456.tq.biz.todaq.net";
@@ -169,6 +170,7 @@ describe("TwinClient.pay", async function() {
         assert.equal(res.result, "Success");
     });
     it("Should handle 423 when attempting parallel payments", async function() {
+        await new Promise(resolve => setTimeout(resolve, 5000));
         try {
             let client = new TwinClient({url: paywall.url, apiKey: paywall.apiKey});
             let url = payer.url;
@@ -243,6 +245,7 @@ describe("TwinClient.micropay", async function() {
         }
     });
     it("Should attach path with paywallPath option (and fail w/ 404)", async function() {
+        await new Promise(resolve => setTimeout(resolve, 5000));
         let client = new TwinClient(payer);
         try {
             await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity, {paywallPath: "/hello?some-param=42&some-other-param=53"});
@@ -255,6 +258,7 @@ describe("TwinClient.micropay", async function() {
         }
     });
     it("Should micropay the paywall", async function() {
+        await new Promise(resolve => setTimeout(resolve, 5000));
         let client = new TwinClient(payer);
         try {
             let res = await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity, {paywallPath: "?some-param=42&some-other-param=53"});
