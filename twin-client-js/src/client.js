@@ -120,7 +120,7 @@ class TwinClient {
         return this.import(bytes);
     }
 
-    async micropay(url, tokenTypeHash, amount, {method="GET", paywallTail="", data} = {}) {
+    async micropay(url, tokenTypeHash, amount, {method="GET", paywallPath="", data} = {}) {
         let paywallClient = new TwinClient({ url });
         let paywallInfo = await paywallClient.info();
 
@@ -134,7 +134,7 @@ class TwinClient {
         }
 
         let { address: destinationAddress } = paywallInfo;
-        let destinationUrl = encodeURIComponent(`${url}/paywall${paywallTail}`);
+        let destinationUrl = encodeURIComponent(`${url}/paywall/${paywallPath}`);
 
         try {
             return await this.request({

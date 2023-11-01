@@ -242,10 +242,10 @@ describe("TwinClient.micropay", async function() {
             assert.deepEqual(err.data, { error: "Any bad micropay request" });
         }
     });
-    it("Should attach path with paywallTail option (and fail w/ 404)", async function() {
+    it("Should attach path with paywallPath option (and fail w/ 404)", async function() {
         let client = new TwinClient(payer);
         try {
-            await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity, {paywallTail: "/hello?some-param=42&some-other-param=53"});
+            await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity, {paywallPath: "/hello?some-param=42&some-other-param=53"});
             assert.fail("Should throw unhandled TwinError (404)");
         } catch (err) {
             console.error(err);
@@ -257,7 +257,7 @@ describe("TwinClient.micropay", async function() {
     it("Should micropay the paywall", async function() {
         let client = new TwinClient(payer);
         try {
-            let res = await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity, {paywallTail: "?some-param=42&some-other-param=53"});
+            let res = await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity, {paywallPath: "?some-param=42&some-other-param=53"});
             assert(res);
         } catch (err) {
             console.error(err);

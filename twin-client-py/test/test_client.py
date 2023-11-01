@@ -222,7 +222,7 @@ class TestTwinClient(unittest.TestCase):
     pay_type = paywall['config']['targetPayType']
     pay_amt = paywall['config']['targetPayQuantity']
     try:
-      TwinClient(**payer).micropay(pay_url, pay_type, pay_amt, paywall_tail='/hello?some-param=42&some-other-param=53')
+      TwinClient(**payer).micropay(pay_url, pay_type, pay_amt, paywall_path='/hello?some-param=42&some-other-param=53')
       # NOTE(sfertman): ^ /hello... returns 404 from example.com
       assert False
     except Exception as err:
@@ -236,7 +236,7 @@ class TestTwinClient(unittest.TestCase):
     pay_type = paywall['config']['targetPayType']
     pay_amt = paywall['config']['targetPayQuantity']
     try:
-      result = TwinClient(**payer).micropay(pay_url, pay_type, pay_amt, paywall_tail='?some-param=42&some-other-param=53')
+      result = TwinClient(**payer).micropay(pay_url, pay_type, pay_amt, paywall_path='?some-param=42&some-other-param=53')
     except Exception as err:
       print(err.message, err.data)
       raise err
