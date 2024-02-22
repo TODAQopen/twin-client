@@ -94,7 +94,8 @@ class TwinClient {
         return this.request({
             method: "GET",
             url: `/toda/${hash}`,
-            headers: { "content-type": "application/octet-stream" }
+            headers: { "content-type": "application/octet-stream" },
+            responseType: "arraybuffer"
         });
     }
 
