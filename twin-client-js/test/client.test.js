@@ -1,4 +1,3 @@
-import fs from "fs/promises";
 import assert from "assert";
 import { TwinClient } from "../src/client.js";
 import {
@@ -70,23 +69,6 @@ describe("TwinClient.fetch", async function() {
     });
 });
 
-describe("TwinClient.download", async function () {
-    it("Should fetch a binary toda file and save it", async function() {
-        let storeDir = "./test/download";
-        await fs.mkdir(storeDir, { recursive: true });
-        try {
-            let client = new TwinClient(payer);
-            let { binderId } = await client.info();
-            let bytes = await client.download(binderId, storeDir);
-            assert(bytes.length > 0);
-            let bytesOnDisk = await fs.readFile(`${storeDir}/${binderId}.toda`);
-            assert.equal(bytesOnDisk.toString(), bytes.toString(), "Bytes should be saved to disk");
-        } finally {
-            await fs.rm(storeDir, { recursive: true });
-        }
-    });
-});
-
 describe("TwinClient.import", async function() {
     it("Should handle import file failure", async function() {
         try {
@@ -109,25 +91,6 @@ describe("TwinClient.import", async function() {
         let res = await (new TwinClient({url})).import(data);
         assert(res);
     });
-});
-
-describe("TwinClient.upload", async function() {
-   it("Should read file from disk and upload to twin", async function() {
-        let storeDir = "./test/upload";
-        let fileName = "upload-test-file.toda";
-        let filePath = `${storeDir}/${fileName}`;
-        let data = Buffer.from("some-binary-file-content");
-        await fs.mkdir(storeDir, { recursive: true });
-        await fs.writeFile(filePath, data);
-        let url = "https://upload-file-success";
-        nock(url).post("/toda", data).reply(201, {});
-        try {
-            let res = await (new TwinClient({url})).upload(filePath)
-            assert(res);
-        } finally {
-            await fs.rm(storeDir, { recursive: true });
-        }
-   });
 });
 
 describe("TwinClient.pay", async function() {

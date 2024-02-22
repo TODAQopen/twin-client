@@ -1,5 +1,3 @@
-import path from "path";
-import fs from "fs/promises";
 import { HttpClient } from "./http.js";
 import {
     HttpError,
@@ -96,14 +94,9 @@ class TwinClient {
         return this.request({
             method: "GET",
             url: `/toda/${hash}`,
-            headers: { "content-type": "application/octet-stream" }
+            headers: { "content-type": "application/octet-stream" },
+            responseType: "arraybuffer"
         });
-    }
-
-    async download(hash, dir = ".") {
-        let bytes = await this.fetch(hash);
-        await fs.writeFile(path.join(dir, `${hash}.toda`), bytes);
-        return bytes;
     }
 
     import(file) {
@@ -113,11 +106,6 @@ class TwinClient {
             data: file,
             headers: { "content-type": "application/octet-stream" }
         });
-    }
-
-    async upload(filePath) {
-        let bytes = await fs.readFile(filePath);
-        return this.import(bytes);
     }
 
     async micropay(url, tokenTypeHash, amount, {method="GET", paywallPath="", data} = {}) {
