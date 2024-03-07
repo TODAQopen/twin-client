@@ -12,6 +12,20 @@ import testConfig from "./config.js";
 
 const { payer, paywall } = testConfig;
 
+async function retry423(f, retries = 5, timeout = 5000) {
+    for (; retries > 0; retries--) {
+        try {
+            return await f();
+        } catch (e) {
+            if (e instanceof TwinBusyError && retries > 1) {
+                await new Promise((resolve) => setTimeout(resolve, timeout));
+            } else {
+                throw e;
+            }
+        }
+    }
+}
+
 describe("TwinError", async function() {
     it("Should throw TwinError when error is not handled", async function() {
         try {
@@ -101,7 +115,7 @@ describe("TwinClient.pay", async function() {
             let url = "https://4123456.tq.biz.todaq.net";
             let tokenTypeHash = paywall.config.targetPayType;
             let amount = paywall.config.targetPayQuantity;
-            await client.pay(url, tokenTypeHash, amount);
+            await retry423(async () => await client.pay(url, tokenTypeHash, amount));
             assert.fail("Should throw TwinError");
         } catch (err) {
             console.error(err);
@@ -116,7 +130,9 @@ describe("TwinClient.pay", async function() {
         let tokenTypeHash = paywall.config.targetPayType;
         let amount = paywall.config.targetPayQuantity;
 
-        let res = await client.pay(url, tokenTypeHash, amount);
+        let res = await retry423(
+            async () => await client.pay(url, tokenTypeHash, amount)
+        );
         assert.equal(res.result, "Success");
     });
     it("Should handle 423 when attempting parallel payments", async function() {
@@ -143,7 +159,13 @@ describe("TwinClient.micropay", async function() {
         let wrongAmount = 0.1;
         try {
             let client = new TwinClient(payer);
-            await client.micropay(paywall.url, paywall.config.targetPayType, wrongAmount)
+            await retry423(async () =>
+                await client.micropay(
+                    paywall.url,
+                    paywall.config.targetPayType,
+                    wrongAmount
+                )
+            );
             assert.fail("Should throw TwinMicropayAmountMismatchError");
         } catch (err) {
             console.error(err);
@@ -154,7 +176,13 @@ describe("TwinClient.micropay", async function() {
         let wrongTokenHash = paywall.address; // toda hash but not a token
         try {
             let client = new TwinClient(payer);
-            await client.micropay(paywall.url, wrongTokenHash, paywall.config.targetPayQuantity);
+            await retry423(async () =>
+                await client.micropay(
+                    paywall.url,
+                    wrongTokenHash,
+                    paywall.config.targetPayQuantity
+                )
+            );
             assert.fail("Should throw TwinMicropayTokenMismatchError");
         } catch (err) {
             console.error(err);
@@ -182,10 +210,14 @@ describe("TwinClient.micropay", async function() {
                     targetPayQuantity: quantity }});
 
         try {
-            await (new TwinClient({url: payerUrl})).micropay(payeeUrl, tokenType, quantity, {
-                method: "POST",
-                data
-            });
+            await retry423(async () =>
+                await new TwinClient({ url: payerUrl }).micropay(
+                    payeeUrl,
+                    tokenType,
+                    quantity,
+                    { method: "POST", data },
+                )
+            );
             assert.fail("Should throw TwinMicropayError");
         } catch (err) {
             console.error(err);
@@ -198,7 +230,14 @@ describe("TwinClient.micropay", async function() {
         await new Promise(resolve => setTimeout(resolve, 5000));
         let client = new TwinClient(payer);
         try {
-            await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity, {paywallPath: "/hello?some-param=42&some-other-param=53"});
+            await retry423(async () => {
+               await client.micropay(
+                    paywall.url,
+                    paywall.config.targetPayType,
+                    paywall.config.targetPayQuantity,
+                    { paywallPath: "/hello?some-param=42&some-other-param=53" }
+                );
+            });
             assert.fail("Should throw unhandled TwinError (404)");
         } catch (err) {
             console.error(err);
@@ -211,7 +250,14 @@ describe("TwinClient.micropay", async function() {
         await new Promise(resolve => setTimeout(resolve, 5000));
         let client = new TwinClient(payer);
         try {
-            let res = await client.micropay(paywall.url, paywall.config.targetPayType, paywall.config.targetPayQuantity, {paywallPath: "?some-param=42&some-other-param=53"});
+            let res = await retry423(async () =>
+                await client.micropay(
+                    paywall.url,
+                    paywall.config.targetPayType,
+                    paywall.config.targetPayQuantity,
+                    { paywallPath: "?some-param=42&some-other-param=53" }
+                )
+            );
             assert(res);
         } catch (err) {
             console.error(err);
