@@ -34,8 +34,7 @@ describe("TwinError", async function() {
             await (new TwinClient({url})).info();
             assert.fail("Should throw TwinError");
         } catch (err) {
-            console.error(err);
-            assert(err instanceof TwinError);
+            assert(err instanceof TwinError, `Expected a TwinError, got: \n ${err}`);
             assert.equal(err.message, "Teapot");
         }
     });
@@ -47,8 +46,7 @@ describe("TwinAuthError", async function() {
         try {
             await client.request({ method: "GET", url: "/config" });
         } catch (err) {
-            console.error(err)
-            assert(err instanceof TwinAuthError);
+            assert(err instanceof TwinAuthError, `Expected a TwinAuthError, got: \n${err}`);
         }
     });
 });
@@ -92,8 +90,7 @@ describe("TwinClient.import", async function() {
             await (new TwinClient({url})).import(data);
             assert.fail("Should throw TwinError: Bad Request");
         } catch (err) {
-            console.error(err);
-            assert(err instanceof TwinError);
+            assert(err instanceof TwinError, `Expected a TwinError, got: \n${err}`);
             assert.equal(err.message, "Bad Request")
             assert.deepEqual(err.data, { error: "Import error string" });
         }
@@ -118,8 +115,7 @@ describe("TwinClient.pay", async function() {
             await retry423(async () => await client.pay(url, tokenTypeHash, amount));
             assert.fail("Should throw TwinError");
         } catch (err) {
-            console.error(err);
-            assert(err instanceof TwinError);
+            assert(err instanceof TwinError, `Expected a TwinError, got: \n${err}`);
             assert.equal(err.message, "Error connecting to destination twin");
         }
     });
@@ -148,8 +144,7 @@ describe("TwinClient.pay", async function() {
             ]);
             assert.fail("Should throw TwinBusyError");
         } catch (err) {
-            console.error(err);
-            assert(err instanceof TwinBusyError);
+            assert(err instanceof TwinBusyError, `Expected a TwinBusyError, got: \n${err}`);
         }
     });
 });
@@ -168,8 +163,7 @@ describe("TwinClient.micropay", async function() {
             );
             assert.fail("Should throw TwinMicropayAmountMismatchError");
         } catch (err) {
-            console.error(err);
-            assert(err instanceof TwinMicropayAmountMismatchError);
+            assert(err instanceof TwinMicropayAmountMismatchError, `Expected a TwinMicropayAmountMismatchError, got: \n${err}`);
         }
     });
     it("Should throw TwinMicropayTokenMismatchError on wrong token ", async function() {
@@ -185,8 +179,7 @@ describe("TwinClient.micropay", async function() {
             );
             assert.fail("Should throw TwinMicropayTokenMismatchError");
         } catch (err) {
-            console.error(err);
-            assert(err instanceof TwinMicropayTokenMismatchError);
+            assert(err instanceof TwinMicropayTokenMismatchError, `Expected a TwinMicropayTokenMismatchError, got: \n${err}`);
         }
     });
     it("Should throw TwinMicropayError otherwise" , async function() {
@@ -220,8 +213,7 @@ describe("TwinClient.micropay", async function() {
             );
             assert.fail("Should throw TwinMicropayError");
         } catch (err) {
-            console.error(err);
-            assert(err instanceof TwinMicropayError);
+            assert(err instanceof TwinMicropayError, `Expected a TwinMicropayError, got: \n${err}`);
             assert.equal(err.message, "Bad Request")
             assert.deepEqual(err.data, { error: "Any bad micropay request" });
         }
@@ -240,8 +232,7 @@ describe("TwinClient.micropay", async function() {
             });
             assert.fail("Should throw unhandled TwinError (404)");
         } catch (err) {
-            console.error(err);
-            assert(err instanceof TwinError);
+            assert(err instanceof TwinError, `Expected a TwinError, got: \n${err}`);
             assert.equal(err.message, "Unhandled");
             assert.equal(err.data.status, 404);
         }
@@ -249,19 +240,14 @@ describe("TwinClient.micropay", async function() {
     it("Should micropay the paywall", async function() {
         await new Promise(resolve => setTimeout(resolve, 5000));
         let client = new TwinClient(payer);
-        try {
-            let res = await retry423(async () =>
-                await client.micropay(
-                    paywall.url,
-                    paywall.config.targetPayType,
-                    paywall.config.targetPayQuantity,
-                    { paywallPath: "?some-param=42&some-other-param=53" }
-                )
-            );
-            assert(res);
-        } catch (err) {
-            console.error(err);
-            assert.fail("should not throw")
-        }
+        let res = await retry423(async () =>
+            await client.micropay(
+                paywall.url,
+                paywall.config.targetPayType,
+                paywall.config.targetPayQuantity,
+                { paywallPath: "?some-param=42&some-other-param=53" }
+            )
+        );
+        assert(res);
     });
 });
