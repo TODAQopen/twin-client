@@ -22,7 +22,10 @@ class RetryingClient(TwinClient):
             try:
                 return super().request(*args, **kwargs)
             except TwinBusyError as e:
-                raise e if i == 4 else time.sleep(5)
+                if i == 4:
+                    raise e
+                else:
+                    time.sleep(5)
 
 
 class TestTwinClient(unittest.TestCase):
@@ -131,7 +134,7 @@ class TestTwinClient(unittest.TestCase):
     def test_pay_busy_fail(self):
         time.sleep(5)
         try:
-            client = RetryingClient(url=paywall["url"], api_key=paywall["api_key"])
+            client = TwinClient(url=paywall["url"], api_key=paywall["api_key"])
             url = payer["url"]
             token_type_hash = paywall["config"]["targetPayType"]
             amount = paywall["config"]["targetPayQuantity"]
