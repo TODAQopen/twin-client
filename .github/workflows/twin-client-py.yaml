@@ -29,4 +29,4 @@ jobs:
 
       - name: Test
         working-directory: twin-client-py
-        run: python -m unittest
+        run: python -m unittest -v
