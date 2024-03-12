@@ -7,18 +7,18 @@ from .error import *
 
 
 class TwinClient:
-    def __init__(self, url: str, api_key: str = None):
+    def __init__(self, url: str, api_key: str | None = None):
         self.url = url
         self.api_key = api_key
 
     def request(self, method, url, **req_config):
-        if not "headers" in req_config:
+        if "headers" not in req_config:
             req_config["headers"] = {}
-        if not "content-type" in req_config["headers"]:
+        if "content-type" not in req_config["headers"]:
             req_config["headers"]["content-type"] = "application/json"
-        if not "params" in req_config:
+        if "params" not in req_config:
             req_config["params"] = {}
-        if not "apiKey" in req_config:
+        if "apiKey" not in req_config:
             if self.api_key:
                 req_config["params"]["apiKey"] = self.api_key
         resp = requests.request(method, f"{self.url}{url}", **req_config)

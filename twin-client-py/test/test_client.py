@@ -16,6 +16,18 @@ from .config import test_config
 payer, paywall = test_config["payer"], test_config["paywall"]
 
 
+class RetryingClient(TwinClient):
+    def request(self, *args, **kwargs):
+        for i in range(5):
+            try:
+                return super().request(*args, **kwargs)
+            except TwinBusyError as e:
+                if i == 4:
+                    raise e
+                else:
+                    time.sleep(5)
+
+
 class TestTwinClient(unittest.TestCase):
     @requests_mock.Mocker()
     def test_twin_error(self, mreq):
@@ -24,7 +36,7 @@ class TestTwinClient(unittest.TestCase):
             "get", f"{url}/info", status_code=418, json={"error": "Teapot"}
         )
         try:
-            TwinClient(url).info()
+            RetryingClient(url).info()
             assert False
         except TwinError as err:
             print(err.message, err.data)
@@ -32,7 +44,7 @@ class TestTwinClient(unittest.TestCase):
 
     def test_twin_auth_error(self):
         try:
-            TwinClient(payer["url"], "definitely-wrong-api-key").request(
+            RetryingClient(payer["url"], "definitely-wrong-api-key").request(
                 "get", "/config"
             )
             assert False
@@ -41,26 +53,26 @@ class TestTwinClient(unittest.TestCase):
             assert err.message == "Forbidden"
 
     def test_info(self):
-        info = TwinClient(paywall["url"]).info()
+        info = RetryingClient(paywall["url"]).info()
         self.assertEqual(info["address"], paywall["address"])
         self.assertDictEqual(info["paywall"], paywall["config"])
 
     def test_balance(self):
         type_hash = paywall["config"]["targetPayType"]
-        result = TwinClient(**payer).balance(type_hash)
+        result = RetryingClient(**payer).balance(type_hash)
         assert result
         assert isinstance(result["balance"], numbers.Number)
         assert result["type"] == type_hash
 
     def test_fetch(self):
-        client = TwinClient(**payer)
+        client = RetryingClient(**payer)
         binder_id = client.info()["binderId"]
         binder_binary = client.fetch(binder_id)
         self.assertTrue(len(binder_binary) > 0)
 
     def test_download(self):
         with tempfile.TemporaryDirectory() as store_dir:
-            client = TwinClient(**payer)
+            client = RetryingClient(**payer)
             binder_id = client.info()["binderId"]
             binder_bytes = client.download(binder_id, store_dir)
             assert len(binder_bytes) > 0
@@ -79,7 +91,7 @@ class TestTwinClient(unittest.TestCase):
             json={"error": "Import error string"},
         )
         try:
-            TwinClient(url).import_file(data)
+            RetryingClient(url).import_file(data)
             assert False
         except TwinError as err:
             print(err.message, err.data)
@@ -91,7 +103,7 @@ class TestTwinClient(unittest.TestCase):
         url = "https://import-file-success"
         data = b"some-binary-file-content"
         mreq.register_uri("post", f"{url}/toda", json={})
-        result = TwinClient(url).import_file(data)
+        result = RetryingClient(url).import_file(data)
         assert result == {}
 
     @requests_mock.Mocker(real_http=True)
@@ -104,12 +116,12 @@ class TestTwinClient(unittest.TestCase):
                 f.write(data)
             url = "https://upload-file-success"
             mreq.register_uri("post", f"{url}/toda", status_code=201, json={})
-            result = TwinClient(url).upload(file_path)
+            result = RetryingClient(url).upload(file_path)
             assert result == {}
 
     def test_pay_dest_fail(self):
         try:
-            client = TwinClient(paywall["url"], paywall["api_key"])
+            client = RetryingClient(paywall["url"], paywall["api_key"])
             url = "https://4123456.tq.biz.todaq.net"
             token_type_hash = paywall["config"]["targetPayType"]
             amount = paywall["config"]["targetPayQuantity"]
@@ -140,8 +152,7 @@ class TestTwinClient(unittest.TestCase):
 
     def test_pay(self):
         # NOTE(sfertman): This test transfers from PAYWALL back to the PAYEE twin.
-        time.sleep(5)
-        client = TwinClient(paywall["url"], paywall["api_key"])
+        client = RetryingClient(paywall["url"], paywall["api_key"])
         url = payer["url"]
         token_type_hash = paywall["config"]["targetPayType"]
         amount = paywall["config"]["targetPayQuantity"]
@@ -158,7 +169,7 @@ class TestTwinClient(unittest.TestCase):
         pay_amt = paywall["config"]["targetPayQuantity"]
         wrong_amount = 0.1
         try:
-            TwinClient(**payer).micropay(pay_url, pay_type, wrong_amount)
+            RetryingClient(**payer).micropay(pay_url, pay_type, wrong_amount)
             print("Should throw TwinMicropayAmountMismatchError")
             assert False
         except TwinMicropayAmountMismatchError as err:
@@ -174,7 +185,7 @@ class TestTwinClient(unittest.TestCase):
         pay_amt = paywall["config"]["targetPayQuantity"]
         wrong_type = paywall["address"]  # toda hash but not a token
         try:
-            TwinClient(**payer).micropay(pay_url, wrong_type, pay_amt)
+            RetryingClient(**payer).micropay(pay_url, wrong_type, pay_amt)
             print("Should throw TwinMicropayTokenMismatchError")
             assert False
         except TwinMicropayTokenMismatchError as err:
@@ -208,7 +219,7 @@ class TestTwinClient(unittest.TestCase):
             json={"error": "Any bad micropay request"},
         )
         try:
-            TwinClient(payer_url).micropay(
+            RetryingClient(payer_url).micropay(
                 payee_url, token_type, quantity, method="post", data=data
             )
             print("Should throw TwinMicropayError")
@@ -219,12 +230,11 @@ class TestTwinClient(unittest.TestCase):
             assert err.data == {"error": "Any bad micropay request"}
 
     def test_micropay_example_404(self):
-        time.sleep(5)
         pay_url = paywall["url"]
         pay_type = paywall["config"]["targetPayType"]
         pay_amt = paywall["config"]["targetPayQuantity"]
         try:
-            TwinClient(**payer).micropay(
+            RetryingClient(**payer).micropay(
                 pay_url,
                 pay_type,
                 pay_amt,
@@ -238,12 +248,11 @@ class TestTwinClient(unittest.TestCase):
             assert err.data.status_code == 404
 
     def test_micropay(self):
-        time.sleep(5)
         pay_url = paywall["url"]
         pay_type = paywall["config"]["targetPayType"]
         pay_amt = paywall["config"]["targetPayQuantity"]
         try:
-            result = TwinClient(**payer).micropay(
+            result = RetryingClient(**payer).micropay(
                 pay_url,
                 pay_type,
                 pay_amt,
