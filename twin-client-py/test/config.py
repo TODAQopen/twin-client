@@ -1,15 +1,15 @@
 test_config = {
     "paywall": {
-        "url": "https://41678ba2d72dc94b1ba816b93bc98045.tq.biz.todaq.net",
-        "address": "41678ba2d72dc94b1ba816b93bc98045a2dee5af6982c75685e1f1b57c19dcac29",
-        "api_key": "f9ee1ee8-2966-4ed9-b3a7-3dc6dc9a7fc9",
+        "url": "https://41f41fa35e022368a08ce239dbf3b69c.tq.biz.todaq.net",
+        "address": "41f41fa35e022368a08ce239dbf3b69cc49ea5715d73807ff4fd139ea9efba7bdc",
+        "api_key": "b05ba85b-68e7-4de4-b785-bb19a890161b",
         "config": {
-            "targetPayType": "41796848130c3b7527d2bcf289ff3504ebc105f4976741c3b8af65f02db43a81ee",
+            "targetPayType": "4135bf89bc8fc415d7099e737b1718ab12955b1a9440c9410e9d89bfb71215b601",
             "targetPayQuantity": 1,
         },
     },
     "payer": {
-        "url": "https://410ff3ca7c44caa0716cf831cda444e2.tq.biz.todaq.net",
-        "api_key": "fff53e8c-bb79-4662-a3c7-96ee294c13e6",
+        "url": "https://41eb268d8e8f131eb38384b9d2b67060.tq.biz.todaq.net",
+        "api_key": "53839b48-08e3-4a52-b502-e4ffa5ebbb0f",
     },
 }
