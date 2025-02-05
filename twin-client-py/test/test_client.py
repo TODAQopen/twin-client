@@ -8,8 +8,8 @@ import unittest
 
 import requests_mock
 
-from client import TwinClient
-from client.error import *
+from twin_client import TwinClient
+from twin_client.error import *
 
 from .config import test_config
 
