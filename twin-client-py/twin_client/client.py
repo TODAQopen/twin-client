@@ -26,6 +26,8 @@ class TwinClient:
             return resp
         elif resp.status_code == 400:
             raise TwinError("Bad Request", resp.json())
+        elif resp.status_code == 401:
+            raise TwinAuthError("Unauthorized", resp.json())
         elif resp.status_code == 403:
             raise TwinAuthError("Forbidden", resp.json())
         elif resp.status_code == 423:
