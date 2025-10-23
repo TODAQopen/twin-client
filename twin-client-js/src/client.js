@@ -46,6 +46,9 @@ class TwinClient {
                 if (status == 400) {
                     throw new TwinError("Bad Request", data);
                 }
+                if (status == 401) {
+                    throw new TwinAuthError("Unauthorized", data);
+                }
                 if (status == 403) {
                     throw new TwinAuthError("Forbidden", data);
                 }
