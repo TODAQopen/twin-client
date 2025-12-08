@@ -175,13 +175,12 @@ describe("TwinClient.micropay", async function() {
     it("Should throw TwinMicropayError otherwise" , async function() {
         let payerUrl = "https://payer-twin";
         let payeeUrl = "https://payee-twin";
-        let payeeAddress = "mock-address";
         let tokenType = "mock-token-type";
         let quantity = 1;
         let data = { mock: "data" };
 
         nock(payerUrl)
-            .post(`/pay/${payeeAddress}/${tokenType}/${quantity}/https%3A%2F%2Fpayee-twin%2Fpaywall%2F`, data)
+            .post(`/pay/${tokenType}/${quantity}/https%3A%2F%2Fpayee-twin%2Fpaywall%2F`, data)
             .reply(400, { error: "Any bad micropay request" });
 
         nock(payeeUrl)

@@ -124,13 +124,12 @@ class TwinClient {
             throw new TwinMicropayAmountMismatchError(`paywall requires payment of ${paywallConfig.targetPayQuantity}; attempted to send ${amount}`);
         }
 
-        let { address: destinationAddress } = paywallInfo;
         let destinationUrl = encodeURIComponent(`${url}/paywall/${paywallPath}`);
 
         try {
             return await this.request({
                 method,
-                url: `/pay/${destinationAddress}/${tokenTypeHash}/${amount}/${destinationUrl}`,
+                url: `/pay/${tokenTypeHash}/${amount}/${destinationUrl}`,
                 ...data ? { data } : {}
             });
         } catch (err) {
