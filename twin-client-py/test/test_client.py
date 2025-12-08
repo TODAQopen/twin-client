@@ -199,7 +199,6 @@ class TestTwinClient(unittest.TestCase):
     def test_micropay_error(self, mreq):
         payer_url = "https://payer-twin"
         payee_url = "https://payee-twin"
-        payee_address = "mock-address"
         token_type = "mock-token-type"
         quantity = 1
         data = {"mock": "data"}
@@ -207,11 +206,13 @@ class TestTwinClient(unittest.TestCase):
             "get",
             f"{payee_url}/info",
             json={
-                "address": payee_address,
-                "paywall": {"targetPayType": token_type, "targetPayQuantity": quantity},
+                "paywall": {
+                    "targetPayType": token_type,
+                    "targetPayQuantity": quantity
+                  },
             },
         )
-        micropay_url = f"{payer_url}/pay/{payee_address}/{token_type}/{quantity}/https%3A%2F%2Fpayee-twin%2Fpaywall%2F"
+        micropay_url = f"{payer_url}/pay/{token_type}/{quantity}/https%3A%2F%2Fpayee-twin%2Fpaywall%2F"
         mreq.register_uri(
             "post",
             micropay_url,

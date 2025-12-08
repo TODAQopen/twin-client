@@ -92,12 +92,11 @@ class TwinClient:
                 f'paywall requires payment of {paywall_config["targetPayQuantity"]}; attempted to send {amount}'
             )
 
-        destination_address = paywall_info["address"]
         destination_url = quote(f"{url}/paywall/{paywall_path}", safe="")
         try:
             return self.request(
                 method,
-                f"/pay/{destination_address}/{token_type_hash}/{amount}/{destination_url}",
+                f"/pay/{token_type_hash}/{amount}/{destination_url}",
                 json=data,
             )
         except TwinError as err:
