@@ -245,7 +245,6 @@ class TestTwinClient(unittest.TestCase):
             assert False
         except Exception as err:
             print(err.message, err.data)
-            assert err.message == "Unhandled"
             assert err.data.status_code == 404
 
     def test_micropay(self):

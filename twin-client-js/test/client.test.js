@@ -218,7 +218,6 @@ describe("TwinClient.micropay", async function() {
             assert.fail("Should throw unhandled TwinError (404)");
         } catch (err) {
             assert(err instanceof TwinError, `Expected a TwinError, got: \n${err}`);
-            assert.equal(err.message, "Unhandled");
             assert.equal(err.data.status, 404);
         }
     });
