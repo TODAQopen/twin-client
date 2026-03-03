@@ -8,15 +8,15 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
 
     steps:
 
-      - name: Use Node.JS 16.x
+      - name: Use Node.JS 22.x
         uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: 22.x
 
       - name: Checkout
         uses: actions/checkout@v3
