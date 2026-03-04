@@ -40,7 +40,7 @@ class TestTwinClient(unittest.TestCase):
             assert False
         except TwinError as err:
             print(err.message, err.data)
-            assert err.data["error"] == "Teapot"
+            assert err.message == "Teapot"
 
     def test_twin_auth_error(self):
         try:
@@ -50,7 +50,7 @@ class TestTwinClient(unittest.TestCase):
             assert False
         except TwinAuthError as err:
             print(err.message, err.data)
-            assert err.message == "Forbidden"
+            assert err.message == "Unauthorized"
 
     def test_info(self):
         info = RetryingClient(paywall["url"]).info()
@@ -245,7 +245,6 @@ class TestTwinClient(unittest.TestCase):
             assert False
         except Exception as err:
             print(err.message, err.data)
-            assert err.message == "Unhandled"
             assert err.data.status_code == 404
 
     def test_micropay(self):

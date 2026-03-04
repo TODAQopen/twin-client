@@ -25,18 +25,18 @@ class TwinClient:
         if resp.status_code >= 200 and resp.status_code < 300:
             return resp
         elif resp.status_code == 400:
-            raise TwinError("Bad Request", resp.json())
+            raise TwinError("Bad Request", resp.json() if resp.content else {})
         elif resp.status_code == 401:
-            raise TwinAuthError("Unauthorized", resp.json())
+            raise TwinAuthError("Unauthorized", resp.json() if resp.content else {})
         elif resp.status_code == 403:
-            raise TwinAuthError("Forbidden", resp.json())
+            raise TwinAuthError("Forbidden", resp.json() if resp.content else {})
         elif resp.status_code == 423:
-            raise TwinBusyError(None, resp.json())
+            raise TwinBusyError(None, resp.json() if resp.content else {})
         else:
             try:
-                data = resp.json()
+                data = resp.json() if resp.content else {}
                 message = data["error"] if "error" in data else "Unhandled"
-                err = TwinError(message, data)
+                err = TwinError(message, resp)
             except Exception:
                 err = TwinError("Unhandled", resp)
             raise err
